@@ -9,7 +9,7 @@ return {
         desc = "Italic selection",
       },
       {
-        "<leader>b",
+        "<leader>B",
         'c**<C-r>"**<Esc>',
         mode = "v",
         desc = "Bold selection",

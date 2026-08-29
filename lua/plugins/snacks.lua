@@ -37,9 +37,9 @@ return {
     { "<leader>e", "<leader>fe", desc = "Explorer Snacks (root dir)", remap = true },
     { "<leader>E", "<leader>fE", desc = "Explorer Snacks (cwd)", remap = true },
 
-    -- >>> OPTIONAL: Right-side terminal shortcut <<<
+    -- Right-side terminal. <leader>t* is reserved for neotest.
     {
-      "<leader>t",
+      "<leader>T",
       function()
         Snacks.terminal(nil, { win = { position = "right" } })
       end,
