@@ -9,6 +9,39 @@ map("n", "<leader>bd", "<cmd>BufDel<cr>", { desc = "Delete Buffer" })
 map("n", "<leader>bo", "<cmd>BufDelOthers<cr>", { desc = "Delete Other Buffers" })
 map("n", "<A-w>", "<cmd>BufDel<cr>", { desc = "Delete Active Buffer" })
 
+-- Split while inside a terminal buffer (<C-w>s/<C-w>v are normally swallowed
+-- by the shell in terminal mode since it's insert-like). Leaves terminal
+-- mode, splits, opens a fresh terminal in the new split, and re-enters it.
+map("t", "<C-w>s", [[<C-\><C-n><C-w>s<cmd>terminal<cr>i]], { desc = "Split Terminal Below" })
+map("t", "<C-w>v", [[<C-\><C-n><C-w>v<cmd>terminal<cr>i]], { desc = "Split Terminal Right" })
+
+-- :Search !g <query> / :Search !gpt <query> -- DuckDuckGo-style "!bang" web
+-- search. No bang given defaults to Google. Add more engines to the table.
+local search_engines = {
+  g = "https://www.google.com/search?q=",
+  gpt = "https://chatgpt.com/?q=",
+}
+local default_bang = "g"
+
+local function url_encode(str)
+  return (str:gsub("[^%w%-%.%_%~]", function(c)
+    return string.format("%%%02X", c:byte())
+  end))
+end
+
+vim.api.nvim_create_user_command("Search", function(opts)
+  local bang, query = opts.args:match("^!(%S+)%s+(.*)$")
+  if not bang then
+    bang, query = default_bang, opts.args
+  end
+  local base = search_engines[bang]
+  if not base then
+    vim.notify("Search: unknown bang '!" .. bang .. "'", vim.log.levels.ERROR)
+    return
+  end
+  vim.ui.open(base .. url_encode(query))
+end, { nargs = "+", desc = "Web search with !bang, e.g. !g, !gpt" })
+
 -- macOS: Cmd (<D->) does what Ctrl (<C->) does on PC. Linux/Windows are unchanged.
 if vim.fn.has("mac") == 1 then
   if vim.g.neovide then
