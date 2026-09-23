@@ -10,14 +10,23 @@ map("n", "<leader>bo", "<cmd>BufDelOthers<cr>", { desc = "Delete Other Buffers" 
 map("n", "<A-w>", "<cmd>BufDel<cr>", { desc = "Delete Active Buffer" })
 
 -- Split while inside a terminal buffer (<C-w>s/<C-w>v are normally swallowed
--- by the shell in terminal mode since it's insert-like). Leaves terminal
--- mode, splits, opens a fresh terminal in the new split, and re-enters it.
+-- by the shell in terminal mode since it's insert-like), opening a genuinely
+-- new terminal session in the new split. Uses a Lua function rather than a
+-- raw keystroke string: the latter races with the auto-insert autocmd below
+-- (WinEnter fires on the new split *before* the new :terminal replaces the
+-- buffer it's showing, so ":terminal<CR>" ends up typed into the old shell
+-- instead of executed -- which looked like the split "copying" the session).
 -- Both the plain and Ctrl-held second key work (<C-w>s and <C-w><C-s>) since
 -- macOS Cmd is remapped to Ctrl above, and Cmd+w Cmd+s sends <C-w><C-s>.
-map("t", "<C-w>s", [[<C-\><C-n><C-w>s<cmd>terminal<cr>i]], { desc = "Split Terminal Below" })
-map("t", "<C-w><C-s>", [[<C-\><C-n><C-w>s<cmd>terminal<cr>i]], { desc = "Split Terminal Below" })
-map("t", "<C-w>v", [[<C-\><C-n><C-w>v<cmd>terminal<cr>i]], { desc = "Split Terminal Right" })
-map("t", "<C-w><C-v>", [[<C-\><C-n><C-w>v<cmd>terminal<cr>i]], { desc = "Split Terminal Right" })
+local function split_terminal(vertical)
+  vim.cmd(vertical and "vsplit" or "split")
+  vim.cmd("terminal")
+  vim.cmd("startinsert")
+end
+map("t", "<C-w>s", function() split_terminal(false) end, { desc = "Split Terminal Below" })
+map("t", "<C-w><C-s>", function() split_terminal(false) end, { desc = "Split Terminal Below" })
+map("t", "<C-w>v", function() split_terminal(true) end, { desc = "Split Terminal Right" })
+map("t", "<C-w><C-v>", function() split_terminal(true) end, { desc = "Split Terminal Right" })
 
 -- :Search !g <query> / :Search !gpt <query> -- DuckDuckGo-style "!bang" web
 -- search. No bang given defaults to Google. Add more engines to the table.
