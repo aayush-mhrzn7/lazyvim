@@ -7,6 +7,19 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
+-- Auto-enter terminal (insert) mode whenever a terminal buffer becomes
+-- current -- e.g. clicking into it with the mouse, or Ctrl-w window nav.
+-- Snacks-managed terminals already do this on their own; this covers plain
+-- `:terminal` splits too (like the ones opened by <C-w>s/<C-w>v below).
+vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+  desc = "Auto-insert on entering a terminal buffer",
+  callback = function()
+    if vim.bo.buftype == "terminal" then
+      vim.cmd.startinsert()
+    end
+  end,
+})
+
 -- in ~/.config/nvim/lua/config/autocmds.lua
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'vue', 'scss', 'css' },

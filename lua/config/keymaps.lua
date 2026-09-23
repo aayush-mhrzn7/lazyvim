@@ -12,8 +12,12 @@ map("n", "<A-w>", "<cmd>BufDel<cr>", { desc = "Delete Active Buffer" })
 -- Split while inside a terminal buffer (<C-w>s/<C-w>v are normally swallowed
 -- by the shell in terminal mode since it's insert-like). Leaves terminal
 -- mode, splits, opens a fresh terminal in the new split, and re-enters it.
+-- Both the plain and Ctrl-held second key work (<C-w>s and <C-w><C-s>) since
+-- macOS Cmd is remapped to Ctrl above, and Cmd+w Cmd+s sends <C-w><C-s>.
 map("t", "<C-w>s", [[<C-\><C-n><C-w>s<cmd>terminal<cr>i]], { desc = "Split Terminal Below" })
+map("t", "<C-w><C-s>", [[<C-\><C-n><C-w>s<cmd>terminal<cr>i]], { desc = "Split Terminal Below" })
 map("t", "<C-w>v", [[<C-\><C-n><C-w>v<cmd>terminal<cr>i]], { desc = "Split Terminal Right" })
+map("t", "<C-w><C-v>", [[<C-\><C-n><C-w>v<cmd>terminal<cr>i]], { desc = "Split Terminal Right" })
 
 -- :Search !g <query> / :Search !gpt <query> -- DuckDuckGo-style "!bang" web
 -- search. No bang given defaults to Google. Add more engines to the table.
